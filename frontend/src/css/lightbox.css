@@ -671,6 +671,7 @@
 /* Dynamic Captions */
 
 .pswp__dynamic-caption {
+    display: none !important;
     position: absolute;
     width: 100%;
     left: 0;

@@ -1602,42 +1602,8 @@ export default {
       });
     },
     // Returns the picture (model) caption as sanitized HTML, if any.
-    formatCaption(model) {
-      if (!model) {
-        return "";
-      }
-
-      let caption = "";
-
-      if (model.Title) {
-        caption += `<h4>${this.$util.encodeHTML(model.Title.trim())}</h4>`;
-      }
-
-      /*
-        TODO: Find a good position for the date information that works for all screen sizes and image dimensions.
-              We MAY postpone this and display it along with other metadata in the new sidebar.
-       */
-      /* if (model.TakenAtLocal) {
-         caption += `<div>${this.$util.formatDate(model.TakenAtLocal)}</div>`;
-      } */
-
-      if (model.Description && !model.Caption) {
-        model.Caption = model.Description;
-      }
-
-      let text = typeof model.Caption === "string" ? model.Caption.trim() : "";
-
-      if (text) {
-        if (!caption && text.split("\n").length < 2) {
-          // Render large caption if there is no title and it has only one line.
-          caption += `<h4>${this.$util.encodeHTML(text)}</h4>`;
-        } else {
-          // Render small caption otherwise.
-          caption += `<p>${this.$util.encodeHTML(text)}</p>`;
-        }
-      }
-
-      return this.$util.sanitizeHtml(caption);
+    formatCaption() {
+      return "";
     },
     // Removes any event listeners before the lightbox is fully closed.
     onClose() {
