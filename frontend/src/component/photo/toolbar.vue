@@ -431,6 +431,7 @@ export default {
             { value: "duration", text: this.$gettext("Video Duration") },
             { value: "similar", text: this.$gettext("Visual Similarity") },
             { value: "relevance", text: this.$gettext("Most Relevant") },
+            { value: "random", text: this.$gettext("Random") },
           ];
       }
     },

@@ -102,7 +102,7 @@
                 </template>
 
                 <v-list-item
-                  :to="{ name: 'browse', query: { q: 'mono:true quality:3 photo:true' } }"
+                  :to="{ name: 'browse', query: { q: 'mono:true quality:0 photo:true' } }"
                   :exact="true"
                   variant="text"
                   class="nav-monochrome"

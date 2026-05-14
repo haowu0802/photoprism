@@ -35,6 +35,24 @@
         <v-btn value="mosaic" icon="mdi-view-comfy" class="pe-1 action-view-mosaic" @click="setView('mosaic')"></v-btn>
       </v-btn-toggle>
 
+      <v-select
+        v-if="collectionRoute === 'folders'"
+        :model-value="folderSortValue"
+        :label="$gettext('Sort Order')"
+        :menu-props="{ maxHeight: 400 }"
+        single-line
+        hide-details
+        variant="solo-filled"
+        :density="$vuetify.display.smAndDown ? 'comfortable' : 'default'"
+        :items="folderSortOptions"
+        item-title="text"
+        item-value="value"
+        class="ms-1 flex-grow-0"
+        style="max-width: 200px"
+        @update:model-value="onFolderSortChange"
+      >
+      </v-select>
+
       <p-action-menu :items="menuActions" button-class="ms-1"></p-action-menu>
     </v-toolbar>
 
@@ -128,6 +146,23 @@ export default {
       titleRule: (v) => v.length <= this.$config.get("clip") || this.$gettext("Name too long"),
     };
   },
+  computed: {
+    folderSortOptions() {
+      const core = [
+        { value: "random", text: this.$gettext("Random") },
+        { value: "newest", text: this.$gettext("Newest First") },
+        { value: "oldest", text: this.$gettext("Oldest First") },
+      ];
+      const o = this.album?.Order;
+      if (o && !core.some((e) => e.value === o)) {
+        core.push({ value: o, text: this.folderSortExtraLabel(o) });
+      }
+      return core;
+    },
+    folderSortValue() {
+      return this.filter.order || this.album?.Order || "name";
+    },
+  },
   methods: {
     showExpansionPanel() {
       if (!this.expanded) {
@@ -218,6 +253,25 @@ export default {
     },
     onUpdate(v) {
       this.updateQuery(v);
+    },
+    onFolderSortChange(v) {
+      this.updateQuery({ order: v });
+    },
+    folderSortExtraLabel(order) {
+      switch (order) {
+        case "name":
+          return this.$gettext("File Name");
+        case "added":
+          return this.$gettext("Recently Added");
+        case "title":
+          return this.$gettext("Picture Title");
+        case "size":
+          return this.$gettext("File Size");
+        case "duration":
+          return this.$gettext("Video Duration");
+        default:
+          return order;
+      }
     },
     setView(name) {
       if (name) {

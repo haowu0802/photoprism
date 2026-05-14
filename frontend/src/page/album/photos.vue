@@ -102,7 +102,12 @@ export default {
     const q = query["q"] ? query["q"] : "";
     const country = query["country"] ? query["country"] : "";
     const view = this.getViewType();
-    const filter = { country: country, camera: camera, q: q };
+    const filter = {
+      country: country,
+      camera: camera,
+      q: q,
+      order: query["order"] ? query["order"] : "",
+    };
     const settings = { view: view };
     const batchSize = Photo.batchSize();
 
@@ -161,6 +166,7 @@ export default {
       this.filter.q = query["q"] ? query["q"] : "";
       this.filter.camera = query["camera"] ? parseInt(query["camera"]) : 0;
       this.filter.country = query["country"] ? query["country"] : "";
+      this.filter.order = query["order"] ? query["order"] : "";
       this.settings.view = this.getViewType();
 
       /**
@@ -355,11 +361,11 @@ export default {
         offset: offset,
         s: this.uid,
         merged: true,
-        order: this.sortOrder(),
-        reverse: this.sortReverse(),
       };
 
       Object.assign(params, this.lastFilter);
+      params.order = this.sortOrder();
+      params.reverse = this.sortReverse();
 
       if (this.staticFilter) {
         Object.assign(params, this.staticFilter);
@@ -477,11 +483,11 @@ export default {
         offset: this.offset,
         s: this.uid,
         merged: true,
-        order: this.sortOrder(),
-        reverse: this.sortReverse(),
       };
 
       Object.assign(params, this.filter);
+      params.order = this.sortOrder();
+      params.reverse = this.sortReverse();
 
       if (this.staticFilter) {
         Object.assign(params, this.staticFilter);

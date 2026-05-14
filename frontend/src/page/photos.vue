@@ -139,7 +139,7 @@ export default {
       }
 
       if (features.review && (!this.staticFilter || !("quality" in this.staticFilter))) {
-        filter.quality = "3";
+        filter.quality = "0";
       }
     }
 
@@ -203,7 +203,7 @@ export default {
         }
 
         if (settings.features.review && (!this.staticFilter || !("quality" in this.staticFilter))) {
-          this.filter.quality = "3";
+          this.filter.quality = "0";
         }
       }
 
