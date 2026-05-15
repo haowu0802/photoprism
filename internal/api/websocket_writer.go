@@ -36,6 +36,7 @@ var WebsocketTopics = []string{
 	"countries.*",
 	"albums.*",
 	"labels.*",
+	"saved-searches.*",
 	"subjects.*",
 	"people.*",
 	"sync.*",

@@ -350,6 +350,7 @@ export default {
       config: this.$config.values,
       readonly: readonly,
       canUpload: !readonly && !this.embedded && this.$config.allow("files", "upload") && features.upload,
+      canSaveSearch: !readonly && !this.embedded && this.$config.allow("photos", "search"),
       canDelete: !readonly && !this.embedded && this.$config.allow("photos", "delete") && features.delete,
       canAccessLibrary: this.$config.allow("photos", "access_library"),
       featSettings: features.settings,
@@ -473,6 +474,16 @@ export default {
           },
         },
         {
+          name: "save-search",
+          icon: "mdi-bookmark-plus-outline",
+          text: this.$gettext("Save Search") + "…",
+          visible:
+            this.canSaveSearch && (this.context === contexts.Default || this.context === contexts.Photos),
+          click: () => {
+            this.showSaveSearch();
+          },
+        },
+        {
           name: "docs",
           icon: "mdi-book-open-page-variant-outline",
           text: this.$gettext("Get Started"),
@@ -510,6 +521,13 @@ export default {
     },
     showUpload() {
       this.$event.publish("dialog.upload");
+    },
+    showSaveSearch() {
+      this.$event.publish("dialog.saved-search", {
+        query: this.filter.q ? this.filter.q : "",
+        order: this.filter.order ? this.filter.order : "",
+        reverse: !!this.filter.reverse,
+      });
     },
     deleteAll() {
       if (!this.canDelete) {

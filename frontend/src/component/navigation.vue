@@ -178,6 +178,24 @@
                   </v-list-item-title>
                   <span v-show="config.count.archived > 0" class="nav-count-item">{{ config.count.archived }}</span>
                 </v-list-item>
+
+                <template v-if="canSaveSearch && savedSearches.length > 0">
+                  <v-divider class="my-1"></v-divider>
+
+                  <v-list-item
+                    v-for="m in savedSearches"
+                    :key="m.UID"
+                    :to="m.route()"
+                    :exact="true"
+                    variant="text"
+                    class="nav-saved-search"
+                    @click.stop=""
+                  >
+                    <v-list-item-title :class="`nav-menu-item menu-item`">
+                      {{ m.Title }}
+                    </v-list-item-title>
+                  </v-list-item>
+                </template>
               </v-list-group>
             </div>
 
@@ -769,6 +787,7 @@
 
 <script>
 import links from "common/links";
+import SavedSearch from "model/saved-search";
 import { getAppStorage } from "common/storage";
 
 const appStorage = getAppStorage();
@@ -798,6 +817,7 @@ export default {
     return {
       links,
       canSearchPlaces: this.$config.allow("places", "search"),
+      canSaveSearch: this.$config.allow("photos", "search"),
       canAccessPrivate: !isRestricted && this.$config.allow("photos", "access_private"),
       canManagePhotos: canManagePhotos,
       canManagePeople: this.$config.allow("people", "manage"),
@@ -831,6 +851,7 @@ export default {
       speedDial: false,
       rtl: this.$isRtl,
       subscriptions: [],
+      savedSearches: [],
     };
   },
   computed: {
@@ -861,8 +882,13 @@ export default {
     },
   },
   created() {
+    if (this.auth && this.canSaveSearch) {
+      this.loadSavedSearches();
+    }
+
     this.subscriptions.push(this.$event.subscribe("index", this.onIndex));
     this.subscriptions.push(this.$event.subscribe("import", this.onIndex));
+    this.subscriptions.push(this.$event.subscribe("saved-searches", this.onSavedSearchesUpdate));
   },
   beforeUnmount() {
     for (let i = 0; i < this.subscriptions.length; i++) {
@@ -884,6 +910,20 @@ export default {
     },
     openUpload() {
       this.$event.publish("dialog.upload");
+    },
+    loadSavedSearches() {
+      return SavedSearch.search()
+        .then((resp) => {
+          this.savedSearches = resp.models ? resp.models : [];
+        })
+        .catch(() => {
+          this.savedSearches = [];
+        });
+    },
+    onSavedSearchesUpdate() {
+      if (this.auth && this.canSaveSearch) {
+        this.loadSavedSearches();
+      }
     },
     onHome(ev) {
       if (this.$vuetify.display.smAndDown) {

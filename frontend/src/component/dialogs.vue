@@ -10,6 +10,14 @@
     ></p-photo-edit-dialog>
     <p-photo-batch-edit :visible="batchEdit.visible" :selection="batchEdit.selection" @close="closeBatchEdit"></p-photo-batch-edit>
     <p-upload-dialog :visible="upload.visible" :data="upload.data" @close="closeUploadDialog" @confirm="closeUploadDialog"></p-upload-dialog>
+    <p-saved-search-dialog
+      :visible="savedSearch.visible"
+      :query="savedSearch.query"
+      :order="savedSearch.order"
+      :reverse="savedSearch.reverse"
+      @close="closeSavedSearchDialog"
+      @confirm="closeSavedSearchDialog"
+    ></p-saved-search-dialog>
     <p-update :visible="update.visible" @close="closeUpdateDialog"></p-update>
     <p-lightbox @enter="onLightboxEnter" @leave="onLightboxLeave"></p-lightbox>
   </div>
@@ -20,6 +28,7 @@ import Album from "model/album";
 import PPhotoEditDialog from "component/photo/edit/dialog.vue";
 import PPhotoBatchEdit from "component/photo/batch-edit.vue";
 import PUploadDialog from "component/upload/dialog.vue";
+import PSavedSearchDialog from "component/saved-search/dialog.vue";
 import PUpdate from "component/update.vue";
 import PLightbox from "component/lightbox.vue";
 
@@ -29,6 +38,7 @@ export default {
     PPhotoEditDialog,
     PPhotoBatchEdit,
     PUploadDialog,
+    PSavedSearchDialog,
     PUpdate,
     PLightbox,
   },
@@ -48,6 +58,12 @@ export default {
       upload: {
         visible: false,
         data: {},
+      },
+      savedSearch: {
+        visible: false,
+        query: "",
+        order: "",
+        reverse: false,
       },
       update: {
         visible: false,
@@ -77,6 +93,12 @@ export default {
     this.subscriptions.push(
       this.$event.subscribe("dialog.upload", (ev, data) => {
         this.onUpload(data);
+      })
+    );
+
+    this.subscriptions.push(
+      this.$event.subscribe("dialog.saved-search", (ev, data) => {
+        this.onSavedSearch(data);
       })
     );
 
@@ -153,6 +175,21 @@ export default {
     closeUploadDialog() {
       if (this.upload.visible) {
         this.upload.visible = false;
+      }
+    },
+    onSavedSearch(data) {
+      if (this.savedSearch.visible || !this.hasAuth() || !this.$config.allow("photos", "search")) {
+        return;
+      }
+
+      this.savedSearch.query = data?.query ? data.query : "";
+      this.savedSearch.order = data?.order ? data.order : "";
+      this.savedSearch.reverse = !!data?.reverse;
+      this.savedSearch.visible = true;
+    },
+    closeSavedSearchDialog() {
+      if (this.savedSearch.visible) {
+        this.savedSearch.visible = false;
       }
     },
     onUpdate() {

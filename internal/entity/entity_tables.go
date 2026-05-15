@@ -53,6 +53,7 @@ var Entities = Tables{
 	Marker{}.TableName():            &Marker{},
 	Reaction{}.TableName():          &Reaction{},
 	UserShare{}.TableName():         &UserShare{},
+	SavedSearch{}.TableName():       &SavedSearch{},
 }
 
 // WaitForMigration waits for the database migration to be successful and returns an error otherwise.

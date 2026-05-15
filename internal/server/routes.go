@@ -162,6 +162,13 @@ func registerRoutes(router *gin.Engine, conf *config.Config) {
 	api.LikeLabel(APIv1)
 	api.DislikeLabel(APIv1)
 
+	// Saved Searches.
+	api.SearchSavedSearches(APIv1)
+	api.GetSavedSearch(APIv1)
+	api.CreateSavedSearch(APIv1)
+	api.UpdateSavedSearch(APIv1)
+	api.DeleteSavedSearch(APIv1)
+
 	// Files and Folders.
 	api.SearchFoldersOriginals(APIv1)
 	api.SearchFoldersImport(APIv1)
