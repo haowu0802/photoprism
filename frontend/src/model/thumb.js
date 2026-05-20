@@ -137,6 +137,11 @@ export class Thumb extends Model {
     });
   }
 
+  // Moves originals to __trash and removes this photo from the index.
+  trash() {
+    return $api.post("photos/" + this.UID + "/trash");
+  }
+
   // Removes this photo from the given album. Optimistic flip on
   // Removed (drives menu visibility) with previous-value rollback
   // on rejection. Backend publishes only albums.updated (not a

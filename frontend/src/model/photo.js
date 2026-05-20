@@ -1103,6 +1103,11 @@ export class Photo extends RestModel {
     return $api.post("batch/photos/archive", { photos: [this.getId()] });
   }
 
+  // Moves originals to __trash and removes this photo from the index.
+  trash() {
+    return $api.post(this.getEntityResource() + "/trash");
+  }
+
   approve() {
     return $api.post(this.getEntityResource() + "/approve");
   }

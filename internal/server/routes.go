@@ -118,6 +118,7 @@ func registerRoutes(router *gin.Engine, conf *config.Config) {
 	// api.UpdatePhotoLink(APIv1)
 	// api.DeletePhotoLink(APIv1)
 	api.ApprovePhoto(APIv1)
+	api.TrashPhoto(APIv1)
 	api.LikePhoto(APIv1)
 	api.DislikePhoto(APIv1)
 	api.AddPhotoLabel(APIv1)

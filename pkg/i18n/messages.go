@@ -97,6 +97,7 @@ const (
 	MsgAlbumsDeleted
 	MsgZipCreatedIn
 	MsgPermanentlyDeleted
+	MsgMovedToTrash
 	MsgRestored
 	MsgVerified
 	MsgActivated
@@ -199,6 +200,7 @@ var Messages = MessageMap{
 	MsgAlbumsDeleted:         gettext("Albums deleted"),
 	MsgZipCreatedIn:          gettext("Zip created in %d s"),
 	MsgPermanentlyDeleted:    gettext("Permanently deleted"),
+	MsgMovedToTrash:          gettext("Moved to trash"),
 	MsgRestored:              gettext("%s has been restored"),
 	MsgVerified:              gettext("Successfully verified"),
 	MsgActivated:             gettext("Successfully activated"),

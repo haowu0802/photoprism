@@ -107,6 +107,14 @@
       @show="onShowMenu"
       @hide="onHideMenu"
     ></p-lightbox-menu>
+    <p-confirm-dialog
+      :visible="dialog.trash"
+      :text="$gettext('Move this picture to trash? The file will be moved to __trash and removed from your library.')"
+      :action="$gettext('Move to Trash')"
+      icon="mdi-delete-outline"
+      @close="dialog.trash = false"
+      @confirm="confirmTrash"
+    ></p-confirm-dialog>
   </v-dialog>
 </template>
 
@@ -148,6 +156,7 @@ const VIDEO_REMOTE_EVENT_TYPES = ["connect", "connecting", "disconnect"];
 
 import PLightboxMenu from "component/lightbox/menu.vue";
 import PSidebarInfo from "component/sidebar/info.vue";
+import PConfirmDialog from "component/confirm/dialog.vue";
 import { Marker } from "model/marker";
 import * as src from "common/src";
 
@@ -156,7 +165,7 @@ const appSessionStorage = getAppSessionStorage();
 
 export default {
   name: "PLightbox",
-  components: [PLightboxMenu, PSidebarInfo],
+  components: [PLightboxMenu, PSidebarInfo, PConfirmDialog],
   emits: ["enter", "leave"],
   expose: ["onShortCut"],
   data() {
@@ -186,7 +195,11 @@ export default {
       canLike: this.$config.allow("photos", "manage") && features.favorites,
       canDownload: this.$config.allow("photos", "download") && features.download,
       canArchive: this.$config.allow("photos", "delete") && features.archive,
+      canTrash: this.$config.allow("photos", "delete") && features.delete,
       canManageAlbums: this.$config.allow("albums", "manage"),
+      dialog: {
+        trash: false,
+      },
       canFullscreen: $fullscreen.isSupported() && (!this.$isMobile || this.$config.featExperimental()), // see https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenEnabled
       wasFullscreen: $fullscreen.isEnabled(),
       isZoomable: true,
@@ -463,6 +476,7 @@ export default {
       this.canLike = this.$config.allow("photos", "manage") && this.$config.feature("favorites");
       this.canDownload = this.$config.allow("photos", "download") && this.$config.feature("download");
       this.canArchive = this.$config.allow("photos", "delete") && this.$config.feature("archive");
+      this.canTrash = this.$config.allow("photos", "delete") && this.$config.feature("delete");
       this.canManageAlbums = this.$config.allow("albums", "manage");
     },
     // Displays the thumbnail images and/or videos that belong to the specified models in the lightbox.
@@ -1284,6 +1298,26 @@ export default {
               this.close();
             }),
         });
+
+        // Add move-to-trash button (left of information).
+        if (this.canTrash && window.innerWidth > this.mobileBreakpoint) {
+          lightbox.pswp.ui.registerElement({
+            name: "trash-button",
+            className: "pswp__button--trash-button pswp__button--mdi",
+            title: this.$gettext("Move to Trash"),
+            ariaLabel: this.$gettext("Move to Trash"),
+            order: 8,
+            isButton: true,
+            html: {
+              isCustomSVG: true,
+              inner:
+                '<path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" id="pswp__icn-trash"/>',
+              outlineID: "pswp__icn-trash",
+              size: 24,
+            },
+            onClick: (ev) => this.onControlClick(ev, this.onTrash),
+          });
+        }
 
         // Add information toggle button.
         if (window.innerWidth > this.mobileBreakpoint) {
@@ -2761,6 +2795,37 @@ export default {
       return this.model.archive().then(() => {
         this.$notify.success(this.$gettext("Archived"));
       });
+    },
+    onTrash() {
+      if (!this.canTrash) {
+        return;
+      }
+
+      this.pauseSlideshow();
+
+      if (!this.model || !this.model.UID) {
+        this.log("viewer: could not move photo to trash because model UID is unknown");
+        return;
+      }
+
+      this.dialog.trash = true;
+    },
+    confirmTrash() {
+      if (!this.canTrash || !this.model || !this.model.UID) {
+        this.dialog.trash = false;
+        return;
+      }
+
+      this.dialog.trash = false;
+
+      return this.model
+        .trash()
+        .then(() => {
+          this.$notify.success(this.$gettext("Moved to trash"));
+          this.$clipboard.removeId(this.model.UID);
+          return this.close();
+        })
+        .catch(() => {});
     },
     onRestore() {
       if (!this.canArchive) {
