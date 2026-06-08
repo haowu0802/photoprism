@@ -840,6 +840,19 @@
     height: 20px;
 }
 
+.pswp__top-bar .pswp__button--rotate-left-button .pswp__icn,
+.pswp__top-bar .pswp__button--rotate-right-button .pswp__icn {
+    width: 20px;
+    height: 20px;
+}
+
+.pswp__item[data-display-rotate] .pswp__img,
+.pswp__item[data-display-rotate] .pswp__image,
+.pswp__item[data-display-rotate] .pswp__media {
+    transform: rotate(var(--display-rotate, 0deg));
+    transform-origin: center center;
+}
+
 .pswp__top-bar .pswp__button--info-button .pswp__icn {
     width: 20px;
     height: 20px;

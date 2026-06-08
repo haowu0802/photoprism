@@ -200,6 +200,8 @@ export default {
       dialog: {
         trash: false,
       },
+      // Session-wide display rotation in degrees (0, 90, 180, 270). View-only, not persisted.
+      displayRotation: 0,
       canFullscreen: $fullscreen.isSupported() && (!this.$isMobile || this.$config.featExperimental()), // see https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenEnabled
       wasFullscreen: $fullscreen.isEnabled(),
       isZoomable: true,
@@ -1231,6 +1233,8 @@ export default {
         if (firstPicture) {
           firstPicture = false;
         }
+
+        this.$nextTick(() => this.applyDisplayRotation());
       });
 
       // Pauses videos, animations, and live photos when content becomes active (can be default prevented),
@@ -1318,6 +1322,41 @@ export default {
             onClick: (ev) => this.onControlClick(ev, this.onTrash),
           });
         }
+
+        // Add display-only rotation controls (right of trash, left of information).
+        lightbox.pswp.ui.registerElement({
+          name: "rotate-left-button",
+          className: "pswp__button--rotate-left-button pswp__button--mdi",
+          title: this.$gettext("Rotate Left"),
+          ariaLabel: this.$gettext("Rotate Left"),
+          order: 8.1,
+          isButton: true,
+          html: {
+            isCustomSVG: true,
+            inner:
+              '<path d="M15,17H18L14,21L10,17H13V13H15M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V14L19,16V19H5V5H14L16,3H19Z" id="pswp__icn-rotate-left"/>',
+            outlineID: "pswp__icn-rotate-left",
+            size: 24,
+          },
+          onClick: (ev) => this.onControlClick(ev, this.rotateDisplayLeft),
+        });
+
+        lightbox.pswp.ui.registerElement({
+          name: "rotate-right-button",
+          className: "pswp__button--rotate-right-button pswp__button--mdi",
+          title: this.$gettext("Rotate Right"),
+          ariaLabel: this.$gettext("Rotate Right"),
+          order: 8.2,
+          isButton: true,
+          html: {
+            isCustomSVG: true,
+            inner:
+              '<path d="M13,17H10L14,21L18,17H15V13H13M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V14L19,16V19H5V5H16L14,3H19Z" id="pswp__icn-rotate-right"/>',
+            outlineID: "pswp__icn-rotate-right",
+            size: 24,
+          },
+          onClick: (ev) => this.onControlClick(ev, this.rotateDisplayRight),
+        });
 
         // Add information toggle button.
         if (window.innerWidth > this.mobileBreakpoint) {
@@ -1504,6 +1543,26 @@ export default {
           },
         },
         {
+          name: "rotate-left",
+          icon: "mdi-rotate-left",
+          text: this.$gettext("Rotate Left"),
+          disabled: !this.model,
+          visible: true,
+          click: () => {
+            this.rotateDisplayLeft();
+          },
+        },
+        {
+          name: "rotate-right",
+          icon: "mdi-rotate-right",
+          text: this.$gettext("Rotate Right"),
+          disabled: !this.model,
+          visible: true,
+          click: () => {
+            this.rotateDisplayRight();
+          },
+        },
+        {
           name: "archive",
           icon: "mdi-archive",
           text: this.$pgettext("Verb", "Archive"),
@@ -1679,6 +1738,65 @@ export default {
       this.photo = new Photo();
       this.models = [];
       this.index = 0;
+      this.displayRotation = 0;
+    },
+    // Rotates the current lightbox view by the given delta in degrees.
+    rotateDisplay(delta) {
+      if (!delta) {
+        return;
+      }
+
+      this.displayRotation = (this.displayRotation + delta + 360) % 360;
+      this.applyDisplayRotationToAllSlides();
+    },
+    // Applies the session rotation to all loaded slides.
+    applyDisplayRotationToAllSlides() {
+      const pswp = this.pswp();
+
+      if (!pswp?.slides?.length) {
+        this.applyDisplayRotation();
+        return;
+      }
+
+      pswp.slides.forEach((slide) => this.applyDisplayRotation(slide));
+    },
+    // Applies the session display rotation to a slide, or the active slide by default.
+    applyDisplayRotation(slide) {
+      const pswp = this.pswp();
+
+      if (!pswp) {
+        return;
+      }
+
+      const currentSlide = slide || pswp.currSlide;
+
+      if (!currentSlide?.holderElement) {
+        return;
+      }
+
+      const rotation = this.displayRotation;
+      const holder = currentSlide.holderElement;
+      const transform = rotation ? `rotate(${rotation}deg)` : "";
+
+      if (rotation) {
+        holder.setAttribute("data-display-rotate", String(rotation));
+        holder.style.setProperty("--display-rotate", `${rotation}deg`);
+      } else {
+        holder.removeAttribute("data-display-rotate");
+        holder.style.removeProperty("--display-rotate");
+      }
+
+      // PhotoSwipe uses pswp__item as the slide holder, not pswp__slide.
+      holder.querySelectorAll(".pswp__img, .pswp__image, .pswp__media").forEach((el) => {
+        el.style.transform = transform;
+        el.style.transformOrigin = transform ? "center center" : "";
+      });
+    },
+    rotateDisplayLeft() {
+      this.rotateDisplay(-90);
+    },
+    rotateDisplayRight() {
+      this.rotateDisplay(90);
     },
     // Returns the active PhotoSwipe instance, if any.
     // Be sure to check the result before using it!
@@ -1750,6 +1868,9 @@ export default {
 
       // Ensure that content is focused.
       this.focusContent();
+
+      // Restore any display-only rotation for the active slide.
+      this.$nextTick(() => this.applyDisplayRotation());
     },
     // Fetches the full Photo model for the given UID using the LRU
     // cache, delegated to the Thumb model so the photo-fetch policy
