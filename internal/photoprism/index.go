@@ -82,6 +82,11 @@ func (ind *Index) Start(o IndexOptions) (found fs.Done, updated int) {
 	originalsPath := ind.originalsPath()
 	optionsPath := filepath.Join(originalsPath, o.Path)
 
+	if err := VerifyOriginalsAccessible(ind.conf); err != nil {
+		event.Error(OriginalsUnavailableMessage(err))
+		return found, updated
+	}
+
 	if !fs.PathExists(optionsPath) {
 		event.Error(fmt.Sprintf("index: directory %s not found", clean.Log(optionsPath)))
 		return found, updated

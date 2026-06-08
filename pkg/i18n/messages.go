@@ -16,6 +16,7 @@ const (
 	ErrUnsupportedType
 	ErrUnsupportedFormat
 	ErrOriginalsEmpty
+	ErrOriginalsUnavailable
 	ErrSelectionNotFound
 	ErrEntityNotFound
 	ErrAccountNotFound
@@ -117,7 +118,8 @@ var Messages = MessageMap{
 	ErrUnsupported:         gettext("Unsupported"),
 	ErrUnsupportedType:     gettext("Unsupported type"),
 	ErrUnsupportedFormat:   gettext("Unsupported format"),
-	ErrOriginalsEmpty:      gettext("Originals folder is empty"),
+	ErrOriginalsEmpty:         gettext("Originals folder is empty"),
+	ErrOriginalsUnavailable:   gettext("Originals storage is unavailable; connect the drive or fix the path before indexing"),
 	ErrSelectionNotFound:   gettext("Selection not found"),
 	ErrEntityNotFound:      gettext("Entity not found"),
 	ErrAccountNotFound:     gettext("Account not found"),

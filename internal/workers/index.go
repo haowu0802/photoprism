@@ -52,6 +52,11 @@ func (w *Index) Start() (err error) {
 
 	path := conf.OriginalsPath()
 
+	if err := photoprism.VerifyOriginalsAccessible(conf); err != nil {
+		event.Error(photoprism.OriginalsUnavailableMessage(err))
+		return err
+	}
+
 	ind := get.Index()
 
 	convert := settings.Index.Convert && conf.SidecarWritable()

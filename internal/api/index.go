@@ -77,6 +77,12 @@ func StartIndexing(router *gin.RouterGroup) {
 			event.InfoMsg(i18n.MsgIndexingOriginals)
 		}
 
+		if err := photoprism.VerifyOriginalsAccessible(conf); err != nil {
+			log.Errorf("index: %s", err)
+			Abort(c, http.StatusServiceUnavailable, i18n.ErrOriginalsUnavailable)
+			return
+		}
+
 		ind := get.Index()
 		lastRun, lastFound := ind.LastRun()
 		indexStart := time.Now()

@@ -1299,8 +1299,8 @@ export default {
             }),
         });
 
-        // Add move-to-trash button (left of information).
-        if (this.canTrash && window.innerWidth > this.mobileBreakpoint) {
+        // Add move-to-trash button (left of information on desktop; always in toolbar).
+        if (this.canTrash) {
           lightbox.pswp.ui.registerElement({
             name: "trash-button",
             className: "pswp__button--trash-button pswp__button--mdi",
@@ -1491,6 +1491,16 @@ export default {
             !this.model?.Archived,
           click: () => {
             this.onRemoveFromAlbum();
+          },
+        },
+        {
+          name: "trash",
+          icon: "mdi-delete-outline",
+          text: this.$gettext("Move to Trash"),
+          disabled: !this.model,
+          visible: this.canTrash && this.context !== contexts.Hidden && this.context !== contexts.BatchEdit,
+          click: () => {
+            this.onTrash();
           },
         },
         {

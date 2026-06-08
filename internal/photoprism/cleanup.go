@@ -44,6 +44,11 @@ func (w *CleanUp) Start(opt CleanUpOptions) (thumbs int, orphans int, sidecars i
 		}
 	}()
 
+	if err = VerifyOriginalsAccessible(w.conf); err != nil {
+		log.Errorf("cleanup: %s", err)
+		return thumbs, orphans, sidecars, err
+	}
+
 	originalsPath := w.conf.OriginalsPath()
 
 	// Check if originals folder is empty.

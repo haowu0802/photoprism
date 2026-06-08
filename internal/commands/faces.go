@@ -274,6 +274,10 @@ func facesIndexAction(ctx *cli.Context) error {
 		log.Infof("config: enabled read-only mode")
 	}
 
+	if err := photoprism.VerifyOriginalsAccessible(conf); err != nil {
+		return cli.Exit(photoprism.OriginalsUnavailableMessage(err), 1)
+	}
+
 	var found fs.Done
 	var lastFound, indexed int
 

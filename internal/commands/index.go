@@ -70,6 +70,10 @@ func indexAction(ctx *cli.Context) error {
 		log.Infof("indexing originals in %s", clean.Log(filepath.Join(conf.OriginalsPath(), subPath)))
 	}
 
+	if err := photoprism.VerifyOriginalsAccessible(conf); err != nil {
+		return cli.Exit(photoprism.OriginalsUnavailableMessage(err), 1)
+	}
+
 	if conf.ReadOnly() {
 		log.Infof("config: enabled read-only mode")
 	}
