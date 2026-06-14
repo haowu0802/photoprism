@@ -94,22 +94,22 @@
         <v-card v-show="expanded" flat color="secondary">
           <v-card-text class="dense">
             <v-row align="center" dense>
-              <v-col cols="12" sm="6" md="3" class="p-countries-select">
+              <v-col v-if="showFavoriteFilter" cols="12" sm="6" md="3" class="p-favorite-select">
                 <v-select
-                  :model-value="filter.country"
-                  :label="$gettext('Country')"
+                  :model-value="filter.favorite"
+                  :label="$gettext('Favorite')"
                   :menu-props="{ maxHeight: 346 }"
                   single-line
                   hide-details
                   variant="solo-filled"
                   :density="density"
-                  :items="countryOptions"
-                  item-title="Name"
-                  item-value="ID"
-                  class="input-countries"
+                  :items="favoriteOptions"
+                  item-title="text"
+                  item-value="value"
+                  class="input-favorite"
                   @update:model-value="
                     (v) => {
-                      onUpdate({ country: v });
+                      onUpdate({ favorite: v });
                     }
                   "
                 >
@@ -356,7 +356,6 @@ export default {
       featSettings: features.settings,
       listView: this.$config.getSettings()?.search?.listView,
       all: {
-        countries: [{ ID: "", Name: this.$gettext("All Countries") }],
         cameras: [{ ID: 0, Name: this.$gettext("All Cameras") }],
         lenses: [{ ID: 0, Name: this.$gettext("All Lenses") }],
         colors: [{ Slug: "", Name: this.$gettext("All Colors") }],
@@ -373,8 +372,15 @@ export default {
     density() {
       return this.$vuetify.display.smAndDown ? "compact" : "comfortable";
     },
-    countryOptions() {
-      return this.all.countries.concat(this.config.countries);
+    favoriteOptions() {
+      return [
+        { value: "", text: this.$gettext("All") },
+        { value: "true", text: this.$gettext("Favorite") },
+        { value: "false", text: this.$gettext("Non-Favorite") },
+      ];
+    },
+    showFavoriteFilter() {
+      return !this.staticFilter?.favorite;
     },
     cameraOptions() {
       return this.all.cameras.concat(this.config.cameras);

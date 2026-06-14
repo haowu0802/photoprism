@@ -107,7 +107,7 @@ export default {
     const routeName = this.$route.name;
     const camera = query["camera"] ? parseInt(query["camera"]) : 0;
     const q = query["q"] ? query["q"] : "";
-    const country = query["country"] ? query["country"] : "";
+    const favorite = query["favorite"] ? query["favorite"] : "";
     const lens = query["lens"] ? parseInt(query["lens"]) : 0;
     const year = query["year"] ? parseInt(query["year"]) : 0;
     const month = query["month"] ? parseInt(query["month"]) : 0;
@@ -117,7 +117,7 @@ export default {
     const view = this.getViewType();
     const order = this.sortOrder();
     const filter = {
-      country: country,
+      favorite: favorite,
       camera: camera,
       lens: lens,
       label: label,
@@ -209,7 +209,7 @@ export default {
 
       this.filter.q = query["q"] ? query["q"] : "";
       this.filter.camera = query["camera"] ? parseInt(query["camera"]) : 0;
-      this.filter.country = query["country"] ? query["country"] : "";
+      this.filter.favorite = query["favorite"] ? query["favorite"] : "";
       this.filter.lens = query["lens"] ? parseInt(query["lens"]) : 0;
       this.filter.year = query["year"] ? parseInt(query["year"]) : 0;
       this.filter.month = query["month"] ? parseInt(query["month"]) : 0;
